@@ -77,8 +77,18 @@ function getQuote(ticker) {
 
             logOutput("time", obj["Meta Data"]["3. Last Refreshed"]);
 
-            logOutput("symbol", chalk.inverse(ticker));
-            logOutput("close", chalk.inverse(today["4. close"]));
+            logOutput("symbol", ticker);
+
+            var currentPrice = parseFloat(today["4. close"]);
+            var openPrice = parseFloat(today["1. open"]);
+
+            if (currentPrice == openPrice) {
+                logOutput("price", currentPrice);
+            } else if (currentPrice < openPrice) {
+                logOutput("price", chalk.red.inverse(currentPrice));
+            } else {
+                logOutput("price", chalk.green.inverse(currentPrice));
+            }
 
             logOutput("open", today["1. open"]);
             logOutput("high", today["2. high"]);
