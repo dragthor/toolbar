@@ -1,0 +1,12 @@
+{
+    "name": "quotes",
+    "version": "0.0.1",
+    "main": "main.js",
+    "author": "Kristofer Krause",
+    "scripts": {
+        "start": "node main.js"
+    },
+    "devDependencies": {
+        "chalk": "2.3.2"
+    }
+}
