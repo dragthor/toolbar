@@ -1,0 +1,1 @@
+npm start GE,ED,VOO,ITOT,FREL,VNQ
