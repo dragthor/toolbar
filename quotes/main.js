@@ -9,7 +9,7 @@ const chalk = require("chalk");
 
 const host = "www.alphavantage.co";
 const port = 443;
-const basePath = "/query?function=TIME_SERIES_DAILY&outputsize=compact";
+const basePath = "/query?function=TIME_SERIES_INTRADAY&outputsize=compact&interval=15min";
 
 var apiKey = process.env.quoteapikey || "";
 
@@ -60,6 +60,8 @@ function getQuote(ticker) {
         path: basePath + "&symbol=" + ticker + "&apikey=" + apiKey
     };
 
+    // console.log(options.host + options.path);
+
     const req = https.request(options, function (res) {
         var body = "";
         res.setEncoding("utf8");
@@ -69,31 +71,35 @@ function getQuote(ticker) {
         });
 
         res.on("end", function () {
-            var obj = JSON.parse(body);
-            var mostRecent = Object.keys(obj["Time Series (Daily)"])[0];
-            var today = obj["Time Series (Daily)"][mostRecent];
+            try {
+                var obj = JSON.parse(body);
+                var mostRecent = Object.keys(obj["Time Series (15min)"])[0];
+                var today = obj["Time Series (15min)"][mostRecent];
 
-            console.log("-----------------------------------------");
+                console.log("-----------------------------------------");
 
-            logOutput("time", obj["Meta Data"]["3. Last Refreshed"]);
+                logOutput("time", obj["Meta Data"]["3. Last Refreshed"]);
 
-            logOutput("symbol", ticker);
+                logOutput("symbol", ticker);
 
-            var currentPrice = parseFloat(today["4. close"]);
-            var openPrice = parseFloat(today["1. open"]);
+                var currentPrice = parseFloat(today["4. close"]);
+                var openPrice = parseFloat(today["1. open"]);
 
-            if (currentPrice == openPrice) {
-                logOutput("price", currentPrice);
-            } else if (currentPrice < openPrice) {
-                logOutput("price", chalk.red.inverse(currentPrice));
-            } else {
-                logOutput("price", chalk.green.inverse(currentPrice));
+                if (currentPrice == openPrice) {
+                    logOutput("price", currentPrice);
+                } else if (currentPrice < openPrice) {
+                    logOutput("price", chalk.red.inverse(currentPrice));
+                } else {
+                    logOutput("price", chalk.green.inverse(currentPrice));
+                }
+
+                logOutput("open", today["1. open"]);
+                logOutput("high", today["2. high"]);
+                logOutput("low", today["3. low"]);
+                logOutput("volume", today["5. volume"]);
+            } catch (err) {
+                logRequestError(ticker, err);
             }
-
-            logOutput("open", today["1. open"]);
-            logOutput("high", today["2. high"]);
-            logOutput("low", today["3. low"]);
-            logOutput("volume", today["5. volume"]);
         });
     });
 
